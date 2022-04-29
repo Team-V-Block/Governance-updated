@@ -16,9 +16,7 @@ describe("Governance Contract", function () {
 
   describe("Deployment", function () {
     it("Grants the deploying address a chairman role by default", async function () {
-      expect(await Govern.getRole(owner.address)).to.equal(
-        await Govern.CHAIRMAN_ROLE()
-      );
+      expect(await Govern.getRole(owner.address)).to.equal(await Govern.CHAIRMAN_ROLE());
     });
   });
 
@@ -38,6 +36,21 @@ describe("Governance Contract", function () {
   });
 
   describe("Voting", function () {
+    it("Should be able to change voting allowed status", async function () {
+      //Change voting status
+      await Govern.changeVotingAllowed(false);
+
+      expect(await Govern.votingAllowed()).to.equal(false);
+    });
+    it("Voting results should not return empty", async function () {
+      // Add candidates
+      await Govern.addCandidates(["Ben", "Ban", "Bin", "Bon"]);
+
+      // Vote for a shareholder
+      await Govern.vote(1);
+
+      expect(await Govern.votingResult()).not.empty;
+    });
     it("should allow shareholders to vote if true", async function () {
       // Will pass if votingAllowed is set to true
       assert.equal(await Govern.votingAllowed(), true, "Voting is allowed");
@@ -57,6 +70,25 @@ describe("Governance Contract", function () {
 
       // Expected vote count for Candidate with index 2, "Bin" is 2
       expect(await Govern.getVoteCount(2)).to.equal(2);
+    });
+    it("Should be able to change voting result privacy", async function () {
+      let studentRole = await Govern.STUDENT_ROLE();
+      await Govern.grantRole(studentRole, addr1.address);
+
+      //Change voting status
+      await Govern.changeResultStatus(true);
+
+      // Shareholder adds Candidates
+      await Govern.addCandidates(["Ben", "Ban", "Bin", "Bon"]);
+
+      //Vote for a candidate
+      await Govern.vote(2);
+
+      let votingResult = await Govern.connect(addr1).votingResult();
+
+      expect (votingResult).is.not.empty
+      expect (votingResult).length > 0;
+      expect(await Govern.resultPublic()).to.equal(true);
     });
   });
 });
