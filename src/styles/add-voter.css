@@ -1,0 +1,32 @@
+.form-container {
+  margin-top: 4em;
+  padding: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.addVote-form {
+  display: flex;
+  width: 50%;
+  flex-direction: column;
+  margin-top: 1em;
+  justify-content: space-between;
+}
+
+.addVote-input {
+  height: 50px;
+  padding: 0.5em;
+  border: 2px solid black;
+  border-radius: 0.75em;
+  font-size: 1rem;
+}
+
+.addVote-input::placeholder {
+  font-size: inherit;
+  text-transform: capitalize;
+  opacity: 0.75;
+}
+.addVote-btn {
+  margin-top: 1em;
+}

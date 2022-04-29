@@ -1,0 +1,73 @@
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-block: 1em;
+}
+
+.title {
+  font-size: 2.75rem;
+  font-weight: 600;
+}
+
+.text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: 2rem;
+}
+
+.user-card {
+  position: relative;
+  padding: 0.5em;
+}
+
+.user-card::after {
+  position: absolute;
+  content: "";
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 1px;
+  background-color: black;
+}
+
+.role-info {
+  margin-top: 1em;
+}
+
+.role + .role {
+  margin-top: 0.5em;
+}
+
+.button-container {
+  padding-top: 1em;
+  display: flex;
+  justify-content: center;
+}
+
+.btn {
+  padding: 1em;
+  border: 0;
+  border-radius: 0.75em;
+  background-color: #2a9d8f;
+  font-family: inherit;
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: opacity 150ms ease-in;
+}
+
+.btn:hover {
+  opacity: 0.75;
+}
+
+.btn + .btn {
+  margin-left: 1em;
+}
+
+.btn-connect {
+  margin-top: 1.5em;
+  margin-left: 2em;
+}
