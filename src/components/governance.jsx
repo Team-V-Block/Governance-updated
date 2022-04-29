@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { BigNumber } from "ethers";
 import ABI from "../../artifacts/contracts/Governance.sol/Governance.json";
@@ -7,41 +7,64 @@ import "../styles/governance.css";
 const Vote = () => {
   // Variables
   const contractAddress = "0x64bC644e2225D7e6B75A8543221556e0E1A5a955";
-  const [voteContract, setVoteContract] = useState(null);
   const [defaultAccount, setDefaultAccount] = useState(null);
   const [balance, setBalance] = useState(null);
   const [chairmanRole, setChairmanRole] = useState(null);
   const [teacherRole, setTeacherRole] = useState(null);
   const [studentRole, setStudentRole] = useState(null);
+  const [contract, setContract] = useState(null);
+  const [connectBtnText, setConnectBtnText] = useState("Connect to Metamask");
+  const [errorMessage, setErrorMessage] = useState();
 
   // Connect To MetaMask
   const connectToMetamask = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const accounts = await provider.send("eth_requestAccounts", []);
-    const balance = await provider.getBalance(accounts[0]);
-    const addressBalance = ethers.utils.formatEther(balance);
-
-    // ******* READ FUNCTIONS *******
-
-    const contract = new ethers.Contract(contractAddress, ABI.abi, signer);
-
-    // setVoteContractRead(contractRead);
-    setVoteContract(contract);
-
-    const Chairman = await voteContract.CHAIRMAN_ROLE();
-    const Teacher = await voteContract.TEACHER_ROLE();
-    const Student = await voteContract.STUDENT_ROLE();
-
-    setDefaultAccount(accounts[0]);
-    setBalance(addressBalance);
-    setChairmanRole(Chairman);
-    setTeacherRole(Teacher);
-    setStudentRole(Student);
+    if (window.ethereum) {
+      window.ethereum
+        .request({ method: "eth_requestAccounts" })
+        .then((accounts) => {
+          setDefaultAccount(accounts[0].toString());
+          updateEthers();
+          setConnectBtnText(" MetaMask Connected ✔");
+        })
+        .catch((err) => {
+          setErrorMessage(err.message);
+        });
+    } else {
+      setErrorMessage("Install MetaMask to Continue!");
+    }
   };
 
-  // ******* WRITE FUNCTIONS *******
+  const updateEthers = () => {
+    let provider = new ethers.providers.Web3Provider(window.ethereum);
+    let signer = provider.getSigner();
+    let tempContract = new ethers.Contract(contractAddress, ABI.abi, signer);
+    setContract(tempContract);
+  };
 
+  const updateBalance = () => {
+    window.ethereum
+      .request({
+        method: "eth_getBalance",
+        params: [defaultAccount, "latest"],
+      })
+      .then((balance) => {
+        setBalance(ethers.utils.formatEther(balance));
+      })
+      .catch((err) => console.log(err.message));
+  };
+
+  // ******* READ FUNCTIONS *******
+  useEffect(() => {
+    updateBalance();
+    async function updateRoles() {
+      setChairmanRole(await contract.CHAIRMAN_ROLE());
+      setTeacherRole(await contract.TEACHER_ROLE());
+      setStudentRole(await contract.STUDENT_ROLE());
+    }
+    updateRoles();
+  }, [defaultAccount, contract]);
+
+  // ******* WRITE FUNCTIONS *******
   // Grant Role
   const grant = async () => {
     await voteContract.grantRole(
@@ -74,9 +97,12 @@ const Vote = () => {
   return (
     <>
       {!defaultAccount ? (
-        <button className="btn-connect btn" onClick={connectToMetamask}>
-          Connect to Metamask
-        </button>
+        <>
+          <button className="btn-connect btn" onClick={connectToMetamask}>
+            {connectBtnText}
+          </button>
+          {errorMessage}
+        </>
       ) : (
         <div className="container">
           <div className="header">
