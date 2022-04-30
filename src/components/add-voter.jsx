@@ -2,7 +2,7 @@ import "../styles/add-voter.css";
 
 const AddVoter = ({ newVoter, setNewVoter, addNewVoter, newVoterStatus }) => {
   const handleNewVoter = (e) => {
-    setNewVoter(e.target.value);
+    setNewVoter({ [e.target.newVoter]:e.target.value});
   };
   return (
     <div className="container container-addVote form-container">

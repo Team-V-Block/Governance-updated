@@ -3,12 +3,14 @@ import { ethers } from "ethers";
 import { BigNumber } from "ethers";
 import ABI from "../../artifacts/contracts/Governance.sol/Governance.json";
 import "../styles/governance.css";
+import { NavLink } from 'react-router-dom';
 
 const Vote = () => {
   // Variables
   const contractAddress = "0x64bC644e2225D7e6B75A8543221556e0E1A5a955";
   const [defaultAccount, setDefaultAccount] = useState(null);
   const [balance, setBalance] = useState(null);
+  const [Role, setRole] = useState(null);
   const [chairmanRole, setChairmanRole] = useState(null);
   const [teacherRole, setTeacherRole] = useState(null);
   const [studentRole, setStudentRole] = useState(null);
@@ -60,6 +62,7 @@ const Vote = () => {
       setChairmanRole(await contract.CHAIRMAN_ROLE());
       setTeacherRole(await contract.TEACHER_ROLE());
       setStudentRole(await contract.STUDENT_ROLE());
+      setRole(await contract.getRole(defaultAccount));
     }
     updateRoles();
   }, [defaultAccount, contract]);
@@ -67,7 +70,7 @@ const Vote = () => {
   // ******* WRITE FUNCTIONS *******
   // Grant Role
   const grant = async () => {
-    await voteContract.grantRole(
+    await contract.grantRole(
       "0x36a5c4aaacb6b388bbd448bf11096b7dafc5652bcc9046084fd0e95b1fb0b2cc",
       "0x777094c9Ede5AD9E04d2b2f00f992CD7f9B0A85C"
     );
@@ -75,22 +78,22 @@ const Vote = () => {
 
   // Change Result Status
   const changeResultOf = async () => {
-    await voteContract.changeResultStatus(true);
+    await contract.changeResultStatus(true);
   };
 
   // Vote
   const voteCandidate = async () => {
-    await voteContract.vote(BigNumber.from("2"));
+    await contract.vote(BigNumber.from("2"));
   };
 
   // Add Candidates
   const addCandidates = async () => {
-    await voteContract.addCandidates(["Hollio"]);
+    await contract.addCandidates(["Hollio"]);
   };
 
   // Change Voting Status
   const changeVoting = async () => {
-    await voteContract.changeVotingAllowed(false);
+    await contract.changeVotingAllowed(false);
   };
 
   // Render MetaMask Button
@@ -98,11 +101,14 @@ const Vote = () => {
     <>
       {!defaultAccount ? (
         <>
+          
           <button className="btn-connect btn" onClick={connectToMetamask}>
             {connectBtnText}
           </button>
           {errorMessage}
+          
         </>
+        
       ) : (
         <div className="container">
           <div className="header">
@@ -111,15 +117,16 @@ const Vote = () => {
           <div className="text-container">
             <div className="user-card">
               <p className="user-address">Welcome {defaultAccount}</p>
-              <p className="user-balance">Your Balance is: {balance}</p>
+              <p className="user-balance">Your Balance is: {balance} ETH</p>
             </div>
             <div className="role-info">
-              <p className="role">Chairman: {chairmanRole}</p>
+            <p className="role">Role:{Role}</p>
+              {/* <p className="role">Chairman: {chairmanRole}</p>
               <p className="role">Student: {studentRole}</p>
-              <p className="role">Teacher: {teacherRole}</p>
+              <p className="role">Teacher: {teacherRole}</p> */}
             </div>
           </div>
-          <div className="button-container">
+          {/* <div className="button-container">
             <button className="btn btn-grant" onClick={grant}>
               grantRole
             </button>
@@ -135,7 +142,7 @@ const Vote = () => {
             <button className="btn btn-changeVoting" onClick={changeVoting}>
               ChangeVotingAllowed
             </button>
-          </div>
+          </div> */}
         </div>
       )}
     </>
