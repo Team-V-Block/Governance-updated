@@ -16,7 +16,7 @@ const CheckVoterAddress = ({
         <input
           value={voterAddressToCheck}
           onChange={handleNewAddressToCheckVote}
-          className="addVote-input"
+          className="input"
           placeholder="Input Address"
         />
         <button onClick={checkAddressVoter} className="addVote-btn btn">

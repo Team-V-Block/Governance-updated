@@ -43,7 +43,9 @@
 .button-container {
   padding-top: 1em;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
 .btn {
@@ -57,6 +59,7 @@
   text-transform: capitalize;
   cursor: pointer;
   transition: opacity 150ms ease-in;
+  margin-top: 1em;
 }
 
 .btn:hover {
@@ -66,8 +69,20 @@
 .btn + .btn {
   margin-left: 1em;
 }
-
+.btn-grant {
+  margin-bottom: 3em;
+}
 .btn-connect {
   margin-top: 1.5em;
   margin-left: 2em;
+}
+
+.role-label {
+  margin-top: 1em;
+}
+.role-dropdown {
+  margin-top: 1em;
+  padding: 1em;
+  border-radius: 0.5em;
+  width: 15em;
 }

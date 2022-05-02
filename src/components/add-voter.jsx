@@ -14,7 +14,7 @@ const AddVoter = ({ newVoter, setNewVoter, addNewVoter, newVoterStatus }) => {
         <input
           value={newVoter}
           onChange={handleNewVoter}
-          className="addVote-input"
+          className="input"
           placeholder="input Address"
         />
         <button onClick={addNewVoter} className="btn addVote-btn">
