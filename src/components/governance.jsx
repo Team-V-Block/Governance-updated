@@ -3,12 +3,14 @@ import { ethers } from "ethers";
 import { BigNumber } from "ethers";
 import ABI from "../../artifacts/contracts/Governance.sol/Governance.json";
 import "../styles/governance.css";
+// import { NavLink } from "react-router-dom";
 
 const Vote = () => {
   // Variables
   const contractAddress = "0x64bC644e2225D7e6B75A8543221556e0E1A5a955";
   const [defaultAccount, setDefaultAccount] = useState("");
   const [balance, setBalance] = useState(null);
+  const [Role, setRole] = useState(null);
   const [chairmanRole, setChairmanRole] = useState(null);
   const [teacherRole, setTeacherRole] = useState(null);
   const [studentRole, setStudentRole] = useState(null);
@@ -75,6 +77,7 @@ const Vote = () => {
       setChairmanRole(await contract.CHAIRMAN_ROLE());
       setTeacherRole(await contract.TEACHER_ROLE());
       setStudentRole(await contract.STUDENT_ROLE());
+      setRole(await contract.getRole(defaultAccount));
     }
     updateRoles();
   }, [defaultAccount, contract]);
@@ -218,7 +221,8 @@ const Vote = () => {
             <button className="btn btn-changeVoting" onClick={changeVoting}>
               ChangeVotingAllowed
             </button>
-          </div>
+          </div>{" "}
+          */}
         </div>
       )}
     </>
