@@ -3,10 +3,13 @@ import { ethers } from "ethers";
 import { BigNumber } from "ethers";
 import ABI from "../../artifacts/contracts/Governance.sol/Governance.json";
 import "../styles/governance.css";
-// import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const Vote = () => {
-  // Variables
+  // =====================
+  //  VARIABLES AND STATE
+  // =====================
+
   const contractAddress = "0x64bC644e2225D7e6B75A8543221556e0E1A5a955";
   const [defaultAccount, setDefaultAccount] = useState("");
   const [balance, setBalance] = useState(null);
@@ -69,8 +72,24 @@ const Vote = () => {
     setOwnRole(await contract.getRole(defaultAccount));
   };
 
+  const roleReadable = (roleHash) => {
+    switch (roleHash) {
+      case chairmanRole:
+        return "Chairman"; // not sure about using the return keyword here
+      case teacherRole:
+        return "Teacher";
+      case studentRole:
+        return "Student";
+      default:
+        return "Unassigned";
+    }
+  };
+
   useEffect(() => {
-    // ******* READ FUNCTIONS *******
+    // ==========================
+    //  CONTRACT READ FUNCTIONS
+    // ==========================
+
     updateBalance();
     checkOwnRole();
     async function updateRoles() {
@@ -82,7 +101,10 @@ const Vote = () => {
     updateRoles();
   }, [defaultAccount, contract]);
 
-  // ******* WRITE FUNCTIONS *******
+  // ==========================
+  //  CONTRACT WRITE FUNCTIONS
+  // ==========================
+
   // Grant Role
   const grant = async (stakeholder, address) => {
     await contract.grantRole(stakeholder, address);
@@ -133,6 +155,10 @@ const Vote = () => {
     setAddress(e.target.value);
   };
 
+  // ========================
+  //  EVENT HANDLER FUNCTIONS
+  // ========================
+
   // Validate Role Selection
   const validateRole = (e) => {
     setStakeholder(e.target.value);
@@ -145,6 +171,7 @@ const Vote = () => {
     setStakeholder("");
     setAddress("");
   };
+
   // Render MetaMask Button
   return (
     <>
@@ -164,7 +191,7 @@ const Vote = () => {
             <div className="user-card">
               <p className="user-address">Welcome {defaultAccount}</p>
               <p className="user-balance">Your Balance is: {balance}</p>
-              <p className="user-role">Your Role hash is: {ownRole}</p>
+              <p className="user-role">Your Role is: {roleReadable(ownRole)}</p>
             </div>
             {/* <div className="role-info">
               <p className="role">Chairman: {chairmanRole}</p>
@@ -191,20 +218,12 @@ const Vote = () => {
               form="role-form"
               onChange={validateRole}
               className="role-dropdown"
+              value={""}
             >
-              <option value="0xdc1958ce1178d6eb32ccc146dcea8933f1978155832913ec88fa509962e1b413">
-                Chairman
-              </option>
-              <option value="0x36a5c4aaacb6b388bbd448bf11096b7dafc5652bcc9046084fd0e95b1fb0b2cc">
-                Teacher
-              </option>
-              <option
-                value="0xd16e204b8a42a15ab0ea6bb8ec1ecdfbe69f38074fc865323af19efe7d9573d9
-
-"
-              >
-                Student
-              </option>
+              <option value=""></option>
+              <option value={chairmanRole}>Chairman</option>
+              <option value={teacherRole}>Teacher</option>
+              <option value={studentRole}>Student</option>
             </select>
             <button className="btn btn-grant" onClick={grantHandler}>
               grantRole
@@ -222,7 +241,6 @@ const Vote = () => {
               ChangeVotingAllowed
             </button>
           </div>{" "}
-          */}
         </div>
       )}
     </>
