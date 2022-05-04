@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { ethers } from "ethers";
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import ABI from "../../artifacts/contracts/Governance.sol/Governance.json";
 import "../styles/governance.css";
 import { NavLink } from "react-router-dom";
@@ -10,7 +9,9 @@ const Vote = () => {
   //  VARIABLES AND STATE
   // =====================
 
-  const contractAddress = "0x64bC644e2225D7e6B75A8543221556e0E1A5a955";
+  // const contractAddress = "0x64bC644e2225D7e6B75A8543221556e0E1A5a955";
+  const contractAddress = "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853";
+
   const [defaultAccount, setDefaultAccount] = useState("");
   const [balance, setBalance] = useState(null);
   const [Role, setRole] = useState(null);
@@ -23,7 +24,7 @@ const Vote = () => {
   const [errorMessage, setErrorMessage] = useState();
   const [stakeholder, setStakeholder] = useState("");
   const [address, setAddress] = useState("");
-  const [candidates, setCandidates] = useState(null);
+  const [candidates, setCandidates] = useState([]);
   const [candidate, setCandidate] = useState(null);
   const [vote, setVote] = useState(null);
   const [result, setResult] = useState(null);
@@ -92,13 +93,14 @@ const Vote = () => {
 
     updateBalance();
     checkOwnRole();
-    async function updateRoles() {
+    async function updateVars() {
       setChairmanRole(await contract.CHAIRMAN_ROLE());
       setTeacherRole(await contract.TEACHER_ROLE());
       setStudentRole(await contract.STUDENT_ROLE());
       setRole(await contract.getRole(defaultAccount));
+      setCandidates(await contract.getCandidates());
     }
-    updateRoles();
+    updateVars();
   }, [defaultAccount, contract]);
 
   // ==========================
@@ -228,6 +230,16 @@ const Vote = () => {
             <button className="btn btn-grant" onClick={grantHandler}>
               grantRole
             </button>
+            {candidates != null
+              ? candidates.map(({ name, voteCount }, idx) => (
+                  <>
+                    <div key={idx}>
+                      {name} has {voteCount.toNumber()} Votes
+                    </div>
+                    <br />
+                  </>
+                ))
+              : "speak"}
             <button className="btn btn-add" onClick={addCandidates}>
               addCandidates
             </button>

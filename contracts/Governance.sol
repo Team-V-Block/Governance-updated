@@ -148,4 +148,8 @@ contract Governance {
             candidates.push(candidate({name: names[i], voteCount: 0}));
         }
     }
+
+    function getCandidates () public view returns(candidate[] memory){
+        return candidates;
+    }
 }
