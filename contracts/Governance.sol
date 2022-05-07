@@ -12,7 +12,7 @@ contract Governance {
     bool public resultPublic = false;
 
     //define event for vote
-    event shareholderVoted (address account, uint candidateIndex);
+    event shareholderVoted (address indexed account, uint candidateIndex);
 
     event roleGranted (address account, bytes32 role);
     

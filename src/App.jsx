@@ -1,20 +1,17 @@
-import CheckVoterAddress from "./components/check-voter-address";
-import Vote from "./components/governance";
-import AddVoter from "./components/add-voter";
-import "./App.css";
-import GrantRole from "./components/grantRole";
-import AddCandidate from "./components/addCandidate";
-import VoteCan from "./components/voteCandidate";
-import ChangeVote from "./components/changeVote";
-import ChangeResult from "./components/changeResult";
-import Admin from "./components/admin";
+import CheckVoterAddress from "./sections/check-voter-address";
+import Vote from "./sections/governance";
+import AddVoter from "./sections/add-voter";
+import GrantRole from "./sections/grantRole";
+import AddCandidate from "./sections/addCandidate";
+import ChangeVote from "./sections/changeVote";
+import ChangeResult from "./sections/changeResult";
+import Admin from "./sections/admin";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
     <>
       <Vote />
-      <VoteCan />
       {/* <AddVoter />
       <CheckVoterAddress /> */}
       {/* <GrantRole />

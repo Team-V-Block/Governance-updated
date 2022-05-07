@@ -10,16 +10,16 @@ const CheckVoterAddress = ({
     setVoterAddressToCheck(e.target.value);
   };
   return (
-    <div className="form-container container check-container">
-      <h4 className="addVote-title">Check if an address vote status</h4>
-      <div className="addVote-form">
+    <div className="wrapper wrapper--form">
+      <h4 className="">Check if an address has vote status</h4>
+      <div className="">
         <input
           value={voterAddressToCheck}
           onChange={handleNewAddressToCheckVote}
           className="input"
           placeholder="Input Address"
         />
-        <button onClick={checkAddressVoter} className="addVote-btn btn">
+        <button onClick={checkAddressVoter} className="btn">
           Check
         </button>
       </div>

@@ -1,20 +1,22 @@
 import { useState, useEffect } from "react";
 import { BigNumber, ethers } from "ethers";
 import ABI from "../../artifacts/contracts/Governance.sol/Governance.json";
-import "../styles/governance.css";
+import getGovernanceContract from "../utils/getGovernanceContract";
+import "../../dist/index.css";
+import Button from "../components/Button";
+import FormInput from "../components/FormInput";
+import Dropdown from "../components/Dropdown";
+import VoteCandidate from "./voteCandidate";
 import { NavLink } from "react-router-dom";
+import grantRole from "./grantRole";
 
 const Vote = () => {
   // =====================
   //  VARIABLES AND STATE
   // =====================
 
-  // const contractAddress = "0x64bC644e2225D7e6B75A8543221556e0E1A5a955";
-  const contractAddress = "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853";
-
   const [defaultAccount, setDefaultAccount] = useState("");
   const [balance, setBalance] = useState(null);
-  const [Role, setRole] = useState(null);
   const [chairmanRole, setChairmanRole] = useState(null);
   const [teacherRole, setTeacherRole] = useState(null);
   const [studentRole, setStudentRole] = useState(null);
@@ -25,20 +27,16 @@ const Vote = () => {
   const [stakeholder, setStakeholder] = useState("");
   const [address, setAddress] = useState("");
   const [candidates, setCandidates] = useState([]);
-  const [candidate, setCandidate] = useState(null);
-  const [vote, setVote] = useState(null);
-  const [result, setResult] = useState(null);
-  const [allowed, setAllowed] = useState(null);
-  const [byte, setByte] = useState(null);
 
   // Connect To MetaMask
+
   const connectToMetamask = async () => {
     if (window.ethereum) {
       window.ethereum
         .request({ method: "eth_requestAccounts" })
         .then((accounts) => {
           setDefaultAccount(accounts[0].toString());
-          updateEthers();
+          setContract(getGovernanceContract(window.ethereum));
           setConnectBtnText(" MetaMask Connected ✔");
         })
         .catch((err) => {
@@ -47,13 +45,6 @@ const Vote = () => {
     } else {
       setErrorMessage("Install MetaMask to Continue!");
     }
-  };
-
-  const updateEthers = () => {
-    let provider = new ethers.providers.Web3Provider(window.ethereum);
-    let signer = provider.getSigner();
-    let tempContract = new ethers.Contract(contractAddress, ABI.abi, signer);
-    setContract(tempContract);
   };
 
   const updateBalance = () => {
@@ -68,15 +59,10 @@ const Vote = () => {
       .catch((err) => console.log(err.message));
   };
 
-  // Check Own Role
-  const checkOwnRole = async () => {
-    setOwnRole(await contract.getRole(defaultAccount));
-  };
-
   const roleReadable = (roleHash) => {
     switch (roleHash) {
       case chairmanRole:
-        return "Chairman"; // not sure about using the return keyword here
+        return "Chairman";
       case teacherRole:
         return "Teacher";
       case studentRole:
@@ -86,22 +72,20 @@ const Vote = () => {
     }
   };
 
-  useEffect(() => {
-    // ==========================
-    //  CONTRACT READ FUNCTIONS
-    // ==========================
+  // Update Contract dependent Variables
 
+  useEffect(() => {
     updateBalance();
-    checkOwnRole();
-    async function updateVars() {
+    const updateVars = async () => {
       setChairmanRole(await contract.CHAIRMAN_ROLE());
       setTeacherRole(await contract.TEACHER_ROLE());
       setStudentRole(await contract.STUDENT_ROLE());
-      setRole(await contract.getRole(defaultAccount));
       setCandidates(await contract.getCandidates());
-    }
+      setOwnRole(await contract.getRole(defaultAccount));
+    };
     updateVars();
-  }, [defaultAccount, contract]);
+    return () => {};
+  }, [contract]);
 
   // ==========================
   //  CONTRACT WRITE FUNCTIONS
@@ -179,81 +163,94 @@ const Vote = () => {
     <>
       {!defaultAccount ? (
         <>
-          <button className="btn-connect btn" onClick={connectToMetamask}>
-            {connectBtnText}
-          </button>
+          <Button
+            description={connectBtnText}
+            handler={connectToMetamask}
+            className={"btn btn--connect rounded"}
+          />
+
           {errorMessage}
         </>
       ) : (
-        <div className="container">
-          <div className="header">
-            <h1 className="title">ZURI Governance App</h1>
-          </div>
-          <div className="text-container">
-            <div className="user-card">
-              <p className="user-address">Welcome {defaultAccount}</p>
-              <p className="user-balance">Your Balance is: {balance}</p>
-              <p className="user-role">Your Role is: {roleReadable(ownRole)}</p>
+        <>
+          <header className="header">
+            <h1 className="header__title title--large">ZURI Governance App</h1>
+          </header>
+          <section className="section">
+            <div className="section__card ">
+              <p className="section__address contained "> {defaultAccount}</p>
+              <p className="section__balance contained ">
+                Eth Balance: {balance}
+              </p>
+              <p className="section__role contained ">
+                Role: {roleReadable(ownRole)}
+              </p>
             </div>
-            {/* <div className="role-info">
-              <p className="role">Chairman: {chairmanRole}</p>
-              <p className="role">Student: {studentRole}</p>
-              <p className="role">Teacher: {teacherRole}</p>
-            </div> */}
-          </div>
-          <div className="button-container">
-            <form action="" id="role-form">
-              <input
-                type="text"
+            <div className="wrapper rounded">
+              <FormInput
+                type={"text"}
                 value={address}
-                placeholder="Input addresss"
-                onChange={handleChange}
-                className="input"
+                onChangeHandler={handleChange}
+                placeholder={"Input address"}
+                className={"form__input rounded"}
               />
-            </form>
-            <label htmlFor="roles" className="role-label">
-              Assign address a Role
-            </label>
-            <select
-              name="roles"
-              id=""
-              form="role-form"
-              onChange={validateRole}
-              className="role-dropdown"
-              value={""}
-            >
-              <option value=""></option>
-              <option value={chairmanRole}>Chairman</option>
-              <option value={teacherRole}>Teacher</option>
-              <option value={studentRole}>Student</option>
-            </select>
-            <button className="btn btn-grant" onClick={grantHandler}>
-              grantRole
-            </button>
-            {candidates != null
-              ? candidates.map(({ name, voteCount }, idx) => (
-                  <>
-                    <div key={idx}>
-                      {name} has {voteCount.toNumber()} Votes
-                    </div>
-                    <br />
-                  </>
-                ))
-              : "speak"}
-            <button className="btn btn-add" onClick={addCandidates}>
-              addCandidates
-            </button>
-            <button className="btn btn-vote" onClick={voteCandidate}>
-              Vote Candidates
-            </button>
-            <button className="btn btn-changeStatus" onClick={changeResultOf}>
-              changeResultStatus
-            </button>
-            <button className="btn btn-changeVoting" onClick={changeVoting}>
-              ChangeVotingAllowed
-            </button>
-          </div>{" "}
-        </div>
+              <Dropdown
+                onChangeHandler={validateRole}
+                roles={{
+                  chairman: chairmanRole,
+                  teacher: teacherRole,
+                  student: studentRole,
+                }}
+              />
+              <Button
+                description={"Grant Role"}
+                handler={grantHandler}
+                className={"btn rounded"}
+              />
+            </div>
+            <div className="wrapper rounded">
+              <div className="spread mb-1">
+                <span className="title title--small">Name</span>
+                <span className="title title--small">Votes</span>
+              </div>
+              {candidates != null
+                ? candidates.map(({ name, voteCount }, idx) => (
+                    <>
+                      <div key={idx.toString()} className="spread">
+                        <span>{name}</span>
+                        <span>{voteCount.toNumber()}</span>
+                      </div>
+                      <br />
+                    </>
+                  ))
+                : null}
+            </div>
+
+            <VoteCandidate />
+            <div className="wrapper  rounded">
+              <Button
+                description={"Add Candidate"}
+                handler={addCandidates}
+                className={"btn rounded"}
+              />
+              <Button
+                description={"Vote Candidates"}
+                handler={voteCandidate}
+                className={"btn rounded"}
+              />
+              <Button
+                description={"Change Result Access Status"}
+                handler={changeResultOf}
+                className={"btn rounded"}
+              />
+              <Button
+                description={"Change Voting status"}
+                handler={changeVoting}
+                className={"btn rounded"}
+              />
+            </div>
+          </section>
+        </>
       )}
     </>
   );
